@@ -1,0 +1,13 @@
+{
+  "name": "claude-dj",
+  "version": "0.1.0",
+  "description": "A Claude-powered DJ: browser decks + a CLI that Claude drives through skills.",
+  "type": "module",
+  "bin": { "dj": "./dj.mjs" },
+  "scripts": {
+    "start": "node server.mjs",
+    "analyze": "node dj.mjs analyze",
+    "setup": "node dj.mjs doctor --fix"
+  },
+  "engines": { "node": ">=20" }
+}

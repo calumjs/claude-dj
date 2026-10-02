@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude DJ</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23111'/><circle cx='16' cy='16' r='9' fill='none' stroke='%23ff7a45' stroke-width='2'/><circle cx='16' cy='16' r='2.5' fill='%2336d6e7'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="disc"></span>CLAUDE<span class="dot">·</span>DJ</div>
+  <div class="status" id="engineStatus"><span class="led"></span><span class="txt">engine offline</span></div>
+  <div class="masterbpm"><span id="masterBpm">—</span><small>BPM</small></div>
+  <div class="transition" id="transitionInfo"></div>
+  <div class="spacer"></div>
+  <label class="mastervol">MASTER <input type="range" id="masterVol" min="0" max="1" step="0.01" value="0.9"></label>
+</header>
+
+<section class="scope">
+  <canvas id="scroll" height="150"></canvas>
+</section>
+
+<main class="rig">
+  <section class="deck" data-deck="A">
+    <canvas class="tt" width="340" height="340" title="Drag the record to scratch · drag the platter rim to nudge"></canvas>
+    <div class="deck-head">
+      <div class="deck-letter">A</div>
+      <div class="meta">
+        <div class="title">No track</div>
+        <div class="artist">Load something from the crate</div>
+      </div>
+      <div class="bpmbox"><span class="bpm">—</span><span class="pitch">0.0%</span></div>
+    </div>
+    <div class="chips"><span class="chip key">—</span><span class="chip energy">E —</span><span class="chip time">0:00</span><span class="chip remain">-0:00</span><span class="chip bar">bar —</span><span class="chip mixout"></span></div>
+    <canvas class="overview" height="64"></canvas>
+    <div class="transport">
+      <button class="btn cue">CUE</button>
+      <button class="btn play">▶</button>
+      <button class="btn sync">SYNC</button>
+      <div class="loops" title="Loop: click = loop this block (snapped) · hold = momentary · shift+click = from the next bar · keys 1-4 (A) 7-0 (B), [ ] halve/double"><button data-loop="4">4</button><button data-loop="8">8</button><button data-loop="16">16</button><button data-loop="32">32</button></div>
+      <div class="jumps" title="Jump to the next section, landing on the bar"><button data-jump="breakdown">break</button><button data-jump="drop">drop</button><button data-jump="outro">outro</button></div>
+      <label class="tempo">TEMPO <input type="range" class="rate" min="0.9" max="1.1" step="0.0005" value="1"></label>
+    </div>
+    <div class="hotcues" title="Hot cues: click = jump on the beat · shift+click = set here"></div>
+    <div class="deckx">
+      <button class="btn sm keylock on" title="Key lock: tempo changes keep the key (WSOLA time-stretch)">KEYLOCK</button>
+      <span class="keyshift" title="Key shift in semitones (double-click to reset)"><button class="ks" data-d="-1">&minus;</button><span class="ksv">0</span><button class="ks" data-d="1">+</button><small>KEY</small></span>
+      <button class="btn sm slip on" title="Slip: after a scratch the track carries on where it would have been">SLIP</button>
+      <select class="xfa" title="Crossfader assign"><option value="left">XF L</option><option value="thru">THRU</option><option value="right">XF R</option></select>
+      <div class="stems off" title="Stem faders (enabled when the track has separated stems)">
+        <label>VOC<input type="range" data-stem="vocals" min="0" max="1" step="0.01" value="1" disabled></label>
+        <label>DRM<input type="range" data-stem="drums" min="0" max="1" step="0.01" value="1" disabled></label>
+        <label>BAS<input type="range" data-stem="bass" min="0" max="1" step="0.01" value="1" disabled></label>
+        <label>OTH<input type="range" data-stem="other" min="0" max="1" step="0.01" value="1" disabled></label>
+      </div>
+    </div>
+  </section>
+
+  <section class="mixer">
+    <div class="strips">
+      <div class="strip" data-deck="A">
+        <div class="sname">A</div>
+        <div class="k" data-ctl="high" data-label="HI"></div>
+        <div class="k" data-ctl="mid" data-label="MID"></div>
+        <div class="k" data-ctl="low" data-label="LOW"></div>
+        <div class="k" data-ctl="filter" data-label="FILTER"></div>
+        <div class="k" data-ctl="echo" data-label="ECHO"></div>
+        <div class="k" data-ctl="fx" data-label="FX"></div>
+        <select class="fxsel" title="Deck FX (beat-synced)"><option value="none">FX off</option><option value="reverb">reverb</option><option value="flanger">flanger</option><option value="phaser">phaser</option><option value="gate">gate</option><option value="crush">crush</option></select>
+        <div class="faderwrap"><canvas class="meter" width="8" height="120"></canvas><input type="range" class="fader" min="0" max="1" step="0.01" value="1" orient="vertical"></div>
+      </div>
+      <div class="strip" data-deck="B">
+        <div class="sname">B</div>
+        <div class="k" data-ctl="high" data-label="HI"></div>
+        <div class="k" data-ctl="mid" data-label="MID"></div>
+        <div class="k" data-ctl="low" data-label="LOW"></div>
+        <div class="k" data-ctl="filter" data-label="FILTER"></div>
+        <div class="k" data-ctl="echo" data-label="ECHO"></div>
+        <div class="k" data-ctl="fx" data-label="FX"></div>
+        <select class="fxsel" title="Deck FX (beat-synced)"><option value="none">FX off</option><option value="reverb">reverb</option><option value="flanger">flanger</option><option value="phaser">phaser</option><option value="gate">gate</option><option value="crush">crush</option></select>
+        <div class="faderwrap"><canvas class="meter" width="8" height="120"></canvas><input type="range" class="fader" min="0" max="1" step="0.01" value="1" orient="vertical"></div>
+      </div>
+    </div>
+    <div class="xf"><span>A·C</span><input type="range" id="xfader" min="0" max="1" step="0.005" value="0"><span>B·D</span></div>
+    <div class="pads" id="pads" title="Sampler"></div>
+  </section>
+
+  <section class="deck" data-deck="B">
+    <canvas class="tt" width="340" height="340" title="Drag the record to scratch · drag the platter rim to nudge"></canvas>
+    <div class="deck-head">
+      <div class="deck-letter">B</div>
+      <div class="meta">
+        <div class="title">No track</div>
+        <div class="artist">Load something from the crate</div>
+      </div>
+      <div class="bpmbox"><span class="bpm">—</span><span class="pitch">0.0%</span></div>
+    </div>
+    <div class="chips"><span class="chip key">—</span><span class="chip energy">E —</span><span class="chip time">0:00</span><span class="chip remain">-0:00</span><span class="chip bar">bar —</span><span class="chip mixout"></span></div>
+    <canvas class="overview" height="64"></canvas>
+    <div class="transport">
+      <button class="btn cue">CUE</button>
+      <button class="btn play">▶</button>
+      <button class="btn sync">SYNC</button>
+      <div class="loops" title="Loop: click = loop this block (snapped) · hold = momentary · shift+click = from the next bar · keys 1-4 (A) 7-0 (B), [ ] halve/double"><button data-loop="4">4</button><button data-loop="8">8</button><button data-loop="16">16</button><button data-loop="32">32</button></div>
+      <div class="jumps" title="Jump to the next section, landing on the bar"><button data-jump="breakdown">break</button><button data-jump="drop">drop</button><button data-jump="outro">outro</button></div>
+      <label class="tempo">TEMPO <input type="range" class="rate" min="0.9" max="1.1" step="0.0005" value="1"></label>
+    </div>
+    <div class="hotcues" title="Hot cues: click = jump on the beat · shift+click = set here"></div>
+    <div class="deckx">
+      <button class="btn sm keylock on" title="Key lock: tempo changes keep the key (WSOLA time-stretch)">KEYLOCK</button>
+      <span class="keyshift" title="Key shift in semitones (double-click to reset)"><button class="ks" data-d="-1">&minus;</button><span class="ksv">0</span><button class="ks" data-d="1">+</button><small>KEY</small></span>
+      <button class="btn sm slip on" title="Slip: after a scratch the track carries on where it would have been">SLIP</button>
+      <select class="xfa" title="Crossfader assign"><option value="left">XF L</option><option value="thru">THRU</option><option value="right">XF R</option></select>
+      <div class="stems off" title="Stem faders (enabled when the track has separated stems)">
+        <label>VOC<input type="range" data-stem="vocals" min="0" max="1" step="0.01" value="1" disabled></label>
+        <label>DRM<input type="range" data-stem="drums" min="0" max="1" step="0.01" value="1" disabled></label>
+        <label>BAS<input type="range" data-stem="bass" min="0" max="1" step="0.01" value="1" disabled></label>
+        <label>OTH<input type="range" data-stem="other" min="0" max="1" step="0.01" value="1" disabled></label>
+      </div>
+    </div>
+  </section>
+</main>
+
+<section class="rig2" id="rig2"></section>
+<section class="keys" id="keys" title="Chop keyboard: grab a beat from a deck, play it from the keyboard (A–K white, W–U black, Z/X octave), record a loop"></section>
+
+<section class="lower">
+  <section class="crate">
+    <div class="crate-head">
+      <h2>Crate</h2>
+      <input id="search" placeholder="Search artist, title, 6A, 128…" autocomplete="off">
+      <span class="count" id="libCount"></span>
+    </div>
+    <div class="grab">
+      <input id="grabInput" placeholder="Paste a YouTube / SoundCloud URL, or type “artist - title” to fetch it" autocomplete="off">
+      <label class="pl"><input type="checkbox" id="grabPlaylist"> playlist</label>
+      <button class="btn" id="grabBtn">GET</button>
+    </div>
+    <div id="jobs"></div>
+    <div class="tablewrap">
+      <table id="lib">
+        <thead><tr><th></th><th>Track</th><th>BPM</th><th>Key</th><th>Energy</th><th>Len</th><th>Load</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="empty" id="libEmpty">Your crate is empty. Fetch a track above, drop audio into <code>library/</code>, or ask Claude: <em>“grab some 2008 hardstyle classics”</em>.</div>
+    </div>
+  </section>
+
+  <aside class="booth">
+    <h2>The booth <small>Claude's decisions, live</small></h2>
+    <div id="feed"></div>
+    <form id="ask">
+      <input id="askInput" placeholder="Request a track or a vibe for Claude…" autocomplete="off">
+      <button class="btn">SEND</button>
+    </form>
+    <label class="tts"><input type="checkbox" id="ttsToggle" checked> let Claude talk on the mic</label>
+  </aside>
+</section>
+
+<div class="overlay" id="startOverlay">
+  <div class="card">
+    <div class="bigdisc"></div>
+    <h1>Claude DJ</h1>
+    <p id="overlayMsg">Browsers need one click before they can play sound.<br>This tab becomes the sound system Claude plays through.</p>
+    <button class="btn big" id="startBtn">Start engine</button>
+    <p class="hint">Then in Claude Code, try <code>/dj-set</code> or just ask: “play me a 30 minute hardstyle set”.</p>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

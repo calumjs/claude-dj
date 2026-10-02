@@ -1,0 +1,54 @@
+{
+  "pads": [
+    {
+      "pad": 1,
+      "kind": "horn",
+      "name": "AIR HORN",
+      "file": "samples/horn.wav",
+      "seconds": 2.05
+    },
+    {
+      "pad": 2,
+      "kind": "riser",
+      "name": "RISER",
+      "file": "samples/riser.wav",
+      "seconds": 4.15,
+      "fitBeats": 8
+    },
+    {
+      "pad": 3,
+      "kind": "boom",
+      "name": "BOOM",
+      "file": "samples/boom.wav",
+      "seconds": 4.52
+    },
+    {
+      "pad": 4,
+      "kind": "siren",
+      "name": "SIREN",
+      "file": "samples/siren.wav",
+      "seconds": 5.6
+    },
+    {
+      "pad": 5,
+      "kind": "zap",
+      "name": "LASER",
+      "file": "samples/zap.wav",
+      "seconds": 0.92
+    },
+    {
+      "pad": 6,
+      "kind": "hey",
+      "name": "HEY!",
+      "file": "samples/hey.wav",
+      "seconds": 0.6
+    },
+    {
+      "pad": 7,
+      "kind": "subdrop",
+      "name": "SUB DROP",
+      "file": "samples/subdrop.wav",
+      "seconds": 4.3
+    }
+  ]
+}

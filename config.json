@@ -1,0 +1,9 @@
+{
+  "port": 4747,
+  "libraryDirs": ["./library", "~/Music"],
+  "downloadDir": "./library/downloads",
+  "targetLoudnessDb": -10,
+  "stems": { "enabled": true, "auto": true, "threads": 2, "concurrency": 2, "model": "htdemucs", "minFreeGB": 3 },
+  "autoDJ": { "enabled": true, "leadSec": 45 },
+  "monitor": { "enabled": true }
+}

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node dj.mjs:*)",
+      "Bash(node dj.mjs *)",
+      "PowerShell(node dj.mjs *)"
+    ]
+  }
+}
