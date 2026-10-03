@@ -33,7 +33,7 @@ const hint = (name) => { const w = times.windows.find((x) => x.name === name); r
 if (names.some((n) => hint(n) == null)) { console.log(`track ${TN} not fully recorded yet`); process.exit(2); }
 const endHint = nextFirst && hint(nextFirst.name) != null ? hint(nextFirst.name) : null;
 const last = mine[mine.length - 1]; const lastEnd = hint(last.name) + last.bars * 240 / last.bpm;
-if (total < lastEnd + 1) { console.log(`recording not far enough yet (${total.toFixed(0)}s < ${lastEnd.toFixed(0)}s)`); process.exit(2); }
+if (total < lastEnd + 1 && times.windows.length === SECTIONS.length && TN === Math.max(...SECTIONS.map((x) => x.track))) { /* final track of a finished take: the runner may land a little early; keep what was recorded */ } else if (total < lastEnd + 1) { console.log(`recording not far enough yet (${total.toFixed(0)}s < ${lastEnd.toFixed(0)}s)`); process.exit(2); }
 // 3) align these windows against the mix
 const NN = String(TN).padStart(2, '0'); const base = `.dj/produce/out/album/t${NN}`; fs.mkdirSync('.dj/produce/out/album', { recursive: true });
 const reel = JSON.parse(fs.readFileSync(`.dj/voices/${dname}-reel.json`, 'utf8'));

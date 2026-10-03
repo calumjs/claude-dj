@@ -96,5 +96,5 @@ for (let p = 0; p < clips.length; p += 12) {
 }
 ff(['-i', cur, '-i', AUDIO, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '256k', '-movflags', '+faststart', '-shortest', OUT]);
 ff(['-i', OUT, '-vf', 'scale=854:480', '-c:v', 'libx264', '-preset', 'medium', '-crf', '27', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart', OUT.replace(/\.mp4$/, ' (480p).mp4')]);
-fs.rmSync(TMP, { recursive: true, force: true });
+try { fs.rmSync(TMP, { recursive: true, force: true }); } catch { /* Windows may still hold a handle; leave the temp dir */ }
 console.log(`🎬 ${OUT} (+480p)`);
