@@ -50,7 +50,7 @@ People in the room can type requests into the **booth** box in the browser; Clau
 | `lib/downloader.mjs` | yt-dlp wrapper: search, download, playlist caps; uses `.dj/youtube-cookies.txt` if you provide one. |
 | `lib/sequencer.mjs`, `lib/monitor.mjs`, `lib/memory.mjs` | Scheduled plan steps and track queue, auto-DJ safety net, mix monitor with transition critiques, set memory + ratings. |
 | `lib/stems.mjs` + `lib/separate.py` | Optional stem separation (demucs) so vocals/drums/bass can be muted or swapped live. |
-| `produce/` | Production toolchain: Playwright page recording, set/album video rendering, caption indexing for speech clips, voice-reel builder, live design runner, per-track cutting, deck screenshots (`snap-deck.mjs`). |
+| `produce/` | Production toolchain: Playwright page recording, set/album video rendering, caption indexing for speech clips, voice-reel builder, live design runner, per-track cutting, speaker footage cut-ins (`video-cuts.mjs`), deck screenshots (`snap-deck.mjs`). |
 
 ![Four decks: beds on A/B, a melodic layer on C, a voice reel ready on D](docs/four-decks.png)
 

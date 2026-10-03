@@ -40,6 +40,12 @@ node produce/make-video.mjs .dj/exports/<session>.mp3 --title "DJ Claude - Frida
 - Speed: roughly 1.5–3× faster than real time on a laptop. Render **after** the set: a render during a live set
   starves the audio engine. Several renders at once share the CPU; run them one after another.
 
+## Speakers on screen (voice designs)
+For a dj-voice / dj-album piece, cut to the person as they speak: download each clip's video to `.dj/video/<videoId>.mp4`
+(`bin/yt-dlp.exe -f "bv*[height<=480]+ba/b[height<=480]" --merge-output-format mp4 -o .dj/video/%(id)s.mp4 <url>`), then
+`node produce/cut-track.mjs <design.mjs> <N> --footage` (or `node produce/video-cuts.mjs <meta.json> <audio> <out.mp4> --bg <viz.mp4> --screen …`).
+Lines whose clip has no footage keep the visualiser; the DJ table fills gaps longer than 3 s.
+
 ## Screenshots of the deck (docs, thumbnails)
 ```bash
 node produce/snap-deck.mjs <trackA> <trackB> [trackC] [trackD] --scale 2     # plays a 1-minute demo, 3840×2160 PNGs in .dj/produce/out/shots

@@ -1,6 +1,8 @@
 // Cut one album track out of a live run-design.mjs session (works while it is still recording): export the session so far,
 // find where the track's reel windows landed (cross-correlation), master to mp3, optionally render its video.
-//   node produce/cut-track.mjs <design.mjs> <trackNo> [--video] [--album "Album Name"] [--artist "DJ Claude"] [--logo png]
+//   node produce/cut-track.mjs <design.mjs> <trackNo> [--video|--footage] [--album "Album Name"] [--artist "DJ Claude"] [--logo png]
+//   --video   visualiser + DJ-table B-roll (produce/make-video.mjs)
+//   --footage speakers' footage cut in on their lines (produce/video-cuts.mjs; needs .dj/video/<videoId>.mp4), viz background, B-roll in gaps
 // Outputs .dj/exports/album/<Album> - NN - <Title>.mp3 (+ .mp4 and (480p).mp4), meta in .dj/produce/out/album/tNN.json.
 // Titles come from the design's TITLES export (album-design.mjs: each song plan's `title`).
 import fs from 'node:fs';
@@ -11,7 +13,7 @@ import { pathToFileURL } from 'node:url';
 try { os.setPriority(process.pid, 19); } catch { /* best effort */ }
 const args = process.argv.slice(2); const flag = (n, d = null) => (args.includes(n) ? args[args.indexOf(n) + 1] : d);
 const pos = args.filter((a, i) => !a.startsWith('--') && !(i > 0 && args[i - 1].startsWith('--')));
-const [DESIGN, tn] = pos; const TN = Number(tn); const VIDEO = args.includes('--video');
+const [DESIGN, tn] = pos; const TN = Number(tn); const VIDEO = args.includes('--video'), FOOTAGE = args.includes('--footage');
 if (!DESIGN || !TN) { console.log('usage: cut-track.mjs <design.mjs> <trackNo> [--video] [--album name] [--artist name] [--logo png]'); process.exit(1); }
 const design = await import(pathToFileURL(path.resolve(DESIGN)).href); const { SECTIONS } = design; const TITLES = design.TITLES || {};
 const dname = path.basename(DESIGN, '.mjs');
@@ -42,14 +44,19 @@ const first = al.sections[0];
 const start = Math.max(0, first.start - 240 / first.bpm), end = Math.min(total, endHint != null ? endHint - 0.05 : al.sections[al.sections.length - 1].start + last.bars * 240 / last.bpm + 2.5);
 const title = TITLES[TN] || `Track ${TN}`;
 const dur = end - start, name = `${ALBUM} - ${NN} - ${title}`.replace(/[<>:"/\\|?*]/g, '').replace(/\.+$/, '');
-const meta = { duration: +dur.toFixed(3), title: `${ARTIST} - ${title}`, session: mp3, start: +start.toFixed(3), end: +end.toFixed(3), sections: al.sections.map((s) => ({ name: s.name, start: +(s.start - start).toFixed(3), end: +(s.start - start + s.bars * 240 / s.bpm).toFixed(3) })) };
+const meta = { duration: +dur.toFixed(3), title: `${ARTIST} - ${title}`, session: mp3, start: +start.toFixed(3), end: +end.toFixed(3), sections: al.sections.map((s) => ({ ...s, start: +(s.start - start).toFixed(3), end: +(s.start - start + s.bars * 240 / s.bpm).toFixed(3) })) };
 fs.writeFileSync(`${base}.json`, JSON.stringify(meta, null, 1));
 fs.mkdirSync('.dj/exports/album', { recursive: true });
 const fadeOut = endHint != null ? 0.6 : 2.5;
 ff(['-ss', start.toFixed(3), '-t', dur.toFixed(3), '-i', mp3, '-af', `afade=t=in:d=0.4,afade=t=out:st=${(dur - fadeOut).toFixed(2)}:d=${fadeOut},alimiter=limit=0.97:attack=3:release=60:level=false,loudnorm=I=-10:TP=-1.0:LRA=9`, '-ar', '48000', `${base}-master.wav`]);
 ff(['-i', `${base}-master.wav`, '-codec:a', 'libmp3lame', '-b:a', '320k', '-metadata', `title=${title}`, '-metadata', `album=${ALBUM}`, '-metadata', `artist=${ARTIST}`, '-metadata', `track=${TN}`, `.dj/exports/album/${name}.mp3`]);
 console.log(`✓ ${name}.mp3  ${start.toFixed(1)}–${end.toFixed(1)} s (${(dur / 60).toFixed(1)} min)`);
-if (VIDEO) {
+if (FOOTAGE) {
+  const scr = times.screen && fs.existsSync(times.screen.file) ? ['--screen', times.screen.file, '--screen-offset', String(+(start - (times.screen.start - times.recordStart) / 1000).toFixed(3))] : [];
+  run(process.execPath, ['produce/viz.mjs', `${base}.json`, `${base}-master.wav`, `${base}-bg.mp4`, ...(LOGO ? ['--logo', LOGO] : [])], { stdio: 'inherit' });
+  run(process.execPath, ['produce/video-cuts.mjs', `${base}.json`, `${base}-master.wav`, `.dj/exports/album/${name}.mp4`, '--bg', `${base}-bg.mp4`, ...scr], { stdio: 'inherit' });
+  fs.rmSync(`${base}-bg.mp4`, { force: true });
+} else if (VIDEO) {
   const scr = times.screen && fs.existsSync(times.screen.file) ? ['--screen', times.screen.file, '--screen-offset', String(+(start - (times.screen.start - times.recordStart) / 1000).toFixed(3))] : [];
   run(process.execPath, ['produce/make-video.mjs', `${base}-master.wav`, '--title', meta.title, '--out', `.dj/exports/album/${name}.mp4`, ...scr, ...(LOGO ? ['--logo', LOGO] : [])], { stdio: 'inherit' });
 }

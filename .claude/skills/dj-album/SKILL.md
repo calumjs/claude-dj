@@ -47,6 +47,7 @@ every 60 s; after each track finishes, cut it while the take continues:
 ```bash
 node produce/cut-track.mjs produce/album-design.mjs 1 --album "Album Name" --artist "DJ Claude"        # master mp3 now
 node produce/cut-track.mjs produce/album-design.mjs 1 --album "Album Name" --video --logo logo.png     # video after the take
+node produce/cut-track.mjs produce/album-design.mjs 1 --album "Album Name" --footage                   # …or with the speakers' footage cut in (.dj/video/<videoId>.mp4)
 node produce/full-album.mjs --album "Album Name"                                                        # one continuous video + mp3
 ```
 Render videos **after** the take (they starve the audio engine) and one at a time.
