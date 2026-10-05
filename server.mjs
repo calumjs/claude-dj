@@ -12,6 +12,7 @@ import { Memory } from './lib/memory.mjs';
 import { Cues } from './lib/cues.mjs';
 import { Monitor } from './lib/monitor.mjs';
 import { Sequencer } from './lib/sequencer.mjs';
+import { healthReport, hasTool } from './lib/health.mjs';
 import { timeOfBar, beatOfTime, timeOfBeat, deckEffectiveCamelot, effBpm } from './lib/music.mjs';
 import os from 'node:os';
 import { spawn } from 'node:child_process';
@@ -628,13 +629,23 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, pub);
     }
     if (p === '/api/jobs') return send(res, 200, downloader.list().map(({ done, log: l, ...j }) => j));
+    if (p === '/api/health') {
+      const [ffmpeg, ffprobe, ytdlp] = await Promise.all([hasTool('ffmpeg'), hasTool('ffprobe'), hasTool('yt-dlp', downloader.localBin)]);
+      return send(res, 200, healthReport({
+        uptimeSec: process.uptime(), port: PORT,
+        engine: { connected: !!engineId && clients.has(engineId), started: !!engineState?.started, ageSec: engineState ? (Date.now() - engineStateAt) / 1000 : null },
+        library: library.status(),
+        stems: { enabled: stems.enabled, available: stems.available, queued: stems.queue.length, running: !!stems.running, failed: stems.failed.size },
+        tools: { ffmpeg, ffprobe, ytdlp },
+      }));
+    }
     if (p === '/api/doctor') {
       return send(res, 200, { ytdlp: downloader.which(), library: library.status(), dirs: library.dirs, downloadDir, engine: liveState().engine, port: PORT });
     }
     if (p === '/api/ytdlp/install' && req.method === 'POST') return send(res, 200, { path: await downloader.ensure() });
 
     // --- static UI
-    const file = path.join(ROOT, 'public', p === '/' ? 'index.html' : p);
+    const file = path.join(ROOT, 'public', p === '/' ? 'index.html' : p === '/health' ? 'health.html' : p);
     if (file.startsWith(path.join(ROOT, 'public')) && fs.existsSync(file) && fs.statSync(file).isFile()) return serveFile(req, res, file);
     send(res, 404, 'not found');
   } catch (e) {

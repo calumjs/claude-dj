@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude DJ · Health</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23111'/><circle cx='16' cy='16' r='9' fill='none' stroke='%23ff7a45' stroke-width='2'/><circle cx='16' cy='16' r='2.5' fill='%2336d6e7'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="disc"></span>CLAUDE<span class="dot">·</span>DJ</div>
+  <div class="status" id="overall"><span class="led"></span><span class="txt">checking…</span></div>
+</header>
+
+<main class="health">
+  <div id="systems"></div>
+  <div class="updated" id="updated"></div>
+</main>
+
+<script type="module">
+const $ = (s) => document.querySelector(s);
+const el = (tag, cls, text) => { const e = document.createElement(tag); e.className = cls; if (text != null) e.textContent = text; return e; };
+
+function render(h) {
+  $('#overall').className = `status ${h.ok ? 'on' : 'bad'}`;
+  $('#overall .txt').textContent = h.ok ? 'all systems healthy' : `${h.systems.filter((s) => !s.ok).length} system(s) unhealthy`;
+  const box = $('#systems');
+  box.textContent = '';
+  let group = null;
+  for (const s of h.systems) {
+    if (s.group !== group) box.append(el('h2', '', (group = s.group)));
+    const row = el('div', `row ${s.ok ? 'ok' : 'bad'}`);
+    row.title = s.ok ? 'healthy' : 'unhealthy';
+    row.append(el('span', 'led'), el('span', 'name', s.name), el('span', 'detail', s.detail));
+    box.append(row);
+  }
+  $('#updated').textContent = `updated ${new Date(h.ts).toLocaleTimeString()}`;
+}
+
+async function refresh() {
+  if (document.hidden) return;
+  try { render(await (await fetch('/api/health')).json()); }
+  catch { $('#overall').className = 'status bad'; $('#overall .txt').textContent = 'server unreachable'; }
+}
+setInterval(refresh, 3000);
+document.addEventListener('visibilitychange', refresh);
+refresh();
+</script>
+</body>
+</html>
