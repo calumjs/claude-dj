@@ -126,7 +126,7 @@ YouTube sometimes asks for a login. Export your cookies to `.dj/youtube-cookies.
 ```bash
 node --test test/*.test.mjs test/server-*.mjs
 ```
-Server tests run scratch copies on ports 4851–4855 with a fake engine and never touch `.dj/`.
+Server tests run scratch copies on ports 4851–4856 with a fake engine and never touch `.dj/`.
 
 ## Notes
 - Built for personal use with music you have the rights to play. Downloads are your responsibility.

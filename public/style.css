@@ -16,6 +16,7 @@
   --dc-dim: #3a5a26;
   --ok: #7ee787;
   --warn: #f2cc60;
+  --bad: #ff5d5d;
   --claude: #e8a17f;
   --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
   --sans: 'Space Grotesk', system-ui, sans-serif;
@@ -40,6 +41,19 @@ body.playing .disc { animation: spin 1.8s linear infinite; }
 .led { width: 8px; height: 8px; border-radius: 50%; background: #444; }
 .status.on .led { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
 .status.warn .led { background: var(--warn); }
+.status.bad .led { background: var(--bad); box-shadow: 0 0 8px var(--bad); }
+a.status { text-decoration: none; cursor: pointer; }
+a.status:hover { color: var(--text); }
+
+/* ---------- /health page ---------- */
+.health { width: 100%; max-width: 720px; margin: 0 auto; padding: 24px 18px; }
+.health h2 { margin: 22px 0 8px; }
+.health .row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; margin-bottom: 6px; }
+.health .row .led { flex: none; width: 12px; height: 12px; background: var(--bad); box-shadow: 0 0 8px var(--bad); }
+.health .row.ok .led { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+.health .row .name { font-weight: 500; }
+.health .row .detail { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--dim); text-align: right; }
+.health .updated { margin-top: 16px; font-family: var(--mono); font-size: 11px; color: var(--faint); }
 .masterbpm { font-family: var(--mono); font-size: 22px; font-weight: 600; }
 .masterbpm small { font-size: 10px; color: var(--dim); margin-left: 4px; }
 .transition { font-family: var(--mono); font-size: 12px; color: var(--claude); }

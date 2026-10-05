@@ -85,7 +85,7 @@ es.addEventListener('cmd', async (e) => {
   }
   pushState();
 });
-es.onerror = () => setStatus('warn', 'server unreachable');
+es.onerror = () => setStatus('bad', 'server unreachable');
 es.addEventListener('record', (e) => { const { on } = JSON.parse(e.data); if (isEngine) { if (on) startRecording(); else stopRecording(); } });
 
 // ---- flight recorder (engine side): telemetry every 200 ms + the master output as audio
@@ -331,6 +331,15 @@ $('#startBtn').onclick = async () => {
   wireControls();
   requestAnimationFrame(frame);
 };
+// header LED follows /api/health (in-memory on the server); no polling while the tab is hidden
+async function refreshHealth() {
+  if (document.hidden) return;
+  try { const h = await (await fetch('/api/health')).json(); setStatus(h.engine.ok ? 'on' : 'bad', h.engine.text); }
+  catch { setStatus('bad', 'server unreachable'); }
+}
+setInterval(refreshHealth, 5000);
+document.addEventListener('visibilitychange', refreshHealth);
+refreshHealth();
 function setStatus(cls, txt) {
   const el = $('#engineStatus');
   el.className = `status ${cls}`;
