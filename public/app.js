@@ -221,7 +221,7 @@ const handlers = {
     setCtl(d.echo, value, ramp, d);
   },
   xfade({ value, ramp }) { setCtl(mixer.xfader, value, ramp, liveDeck()); },
-  master({ value }) { mixer.master.set(Number(value)); },
+  master({ value, ramp }) { setCtl(mixer.master, value, ramp); },
   loop({ deck, beats }) { const d = deckOf(deck); d.setLoop(Number(beats) || 0); return { loop: d.loop }; },
   async mix(args) {
     if (args.track) await loadTrack(args.to, args.track);

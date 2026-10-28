@@ -183,7 +183,7 @@ const commands = {
   async vol() { return control('vol', { deck: deckArg(rest[0]), value: num(rest[1], 'value'), ramp: flags.ramp }); },
   async echo() { return control('echo', { deck: deckArg(rest[0]), value: num(rest[1], 'value'), ramp: flags.ramp }); },
   async xfade() { return control('xfade', { value: num(rest[0], 'value'), ramp: flags.ramp }); },
-  async master() { return control('master', { value: num(rest[0], 'value') }); },
+  async master() { return control('master', { value: num(rest[0], 'value'), ramp: flags.ramp }); },
   async loop() { return control('loop', { deck: deckArg(rest[0]), beats: rest[1] === 'off' ? 0 : num(rest[1] ?? 8, 'beats') }); },
   async perform() {
     const raw = flags.steps || rest.join(' ');
